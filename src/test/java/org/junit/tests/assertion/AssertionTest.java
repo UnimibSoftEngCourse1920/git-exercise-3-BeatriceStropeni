@@ -11,16 +11,13 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.fail;
 
-import java.io.IOException;
 import java.math.BigDecimal;
 
 import org.junit.Assert;
 import org.junit.ComparisonFailure;
 import org.junit.Test;
-import org.junit.function.ThrowingRunnable;
 import org.junit.internal.ArrayComparisonFailure;
 
 /**
@@ -34,8 +31,6 @@ public class AssertionTest {
 //      assert false;
 //  }
 
-    private static final String ASSERTION_ERROR_EXPECTED = "AssertionError expected";
-
     @Test(expected = AssertionError.class)
     public void fails() {
         Assert.fail();
@@ -47,9 +42,7 @@ public class AssertionTest {
             Assert.fail();
         } catch (AssertionError exception) {
             assertEquals("java.lang.AssertionError", exception.toString());
-            return;
         }
-        throw new AssertionError(ASSERTION_ERROR_EXPECTED);
     }
 
     @Test
@@ -58,26 +51,17 @@ public class AssertionTest {
             Assert.fail("woops!");
         } catch (AssertionError exception) {
             assertEquals("java.lang.AssertionError: woops!", exception.toString());
-            return;
         }
-        throw new AssertionError(ASSERTION_ERROR_EXPECTED);
     }
 
-    @Test
+    @Test(expected = AssertionError.class)
     public void arraysNotEqual() {
-        assertArrayEqualsFailure(
-                new Object[]{"right"},
-                new Object[]{"wrong"},
-                "arrays first differed at element [0]; expected:<[right]> but was:<[wrong]>");
+        assertArrayEquals((new Object[]{new Object()}), (new Object[]{new Object()}));
     }
 
-    @Test
+    @Test(expected = AssertionError.class)
     public void arraysNotEqualWithMessage() {
-        assertArrayEqualsFailure(
-                "not equal",
-                new Object[]{"right"},
-                new Object[]{"wrong"},
-                "not equal: arrays first differed at element [0]; expected:<[right]> but was:<[wrong]>");
+        assertArrayEquals("not equal", (new Object[]{new Object()}), (new Object[]{new Object()}));
     }
 
     @Test
@@ -149,11 +133,13 @@ public class AssertionTest {
 
     @Test
     public void arraysDifferAtElement1nullMessage() {
-        assertArrayEqualsFailure(
-                new Object[]{true, true},
-                new Object[]{true, false},
-                "arrays first differed at element [1]; expected:<true> but was:<false>"
-        );
+        try {
+            assertArrayEquals((new Object[]{true, true}), (new Object[]{true,
+                    false}));
+        } catch (AssertionError exception) {
+            assertEquals("arrays first differed at element [1]; expected:<true> but was:<false>", exception
+                    .getMessage());
+        }
     }
 
     @Test
@@ -846,7 +832,6 @@ public class AssertionTest {
     public void assertNotEqualsIgnoresFloatDeltaOnNaN() {
         assertNotEquals(Float.NaN, Float.NaN, 1f);
     }
-<<<<<<< HEAD
 
     @Test(expected = AssertionError.class)
     public void assertThrowsRequiresAnExceptionToBeThrown() {
@@ -1002,10 +987,5 @@ public class AssertionTest {
                 throw t;
             }
         };
-=======
-    @Test
-    public void assertGreaterThan() {
-        System.out.println("Questo funziona");
->>>>>>> refs/heads/greater
     }
 }
